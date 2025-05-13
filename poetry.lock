@@ -38,6 +38,47 @@ files = [
 ]
 
 [[package]]
+name = "anthropic"
+version = "0.51.0"
+description = "The official Python library for the anthropic API"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "anthropic-0.51.0-py3-none-any.whl", hash = "sha256:b8b47d482c9aa1f81b923555cebb687c2730309a20d01be554730c8302e0f62a"},
+    {file = "anthropic-0.51.0.tar.gz", hash = "sha256:6f824451277992af079554430d5b2c8ff5bc059cc2c968cdc3f06824437da201"},
+]
+
+[package.dependencies]
+anyio = ">=3.5.0,<5"
+distro = ">=1.7.0,<2"
+httpx = ">=0.25.0,<1"
+jiter = ">=0.4.0,<1"
+pydantic = ">=1.9.0,<3"
+sniffio = "*"
+typing-extensions = ">=4.10,<5"
+
+[package.extras]
+bedrock = ["boto3 (>=1.28.57)", "botocore (>=1.31.57)"]
+vertex = ["google-auth[requests] (>=2,<3)"]
+
+[[package]]
+name = "anthropic-haystack"
+version = "2.4.1"
+description = "An integration of Anthropic Claude models into the Haystack framework."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "anthropic_haystack-2.4.1-py3-none-any.whl", hash = "sha256:30c3d1e71bda64f69235d222cac5c77083a4c1284cbe7c3882d08d49431d4fb5"},
+    {file = "anthropic_haystack-2.4.1.tar.gz", hash = "sha256:d2e00ea1ae8081c13eb64f1ab45a910dfb5a1d2e94a8c2eca87cf5c32ddd9455"},
+]
+
+[package.dependencies]
+anthropic = "*"
+haystack-ai = ">=2.9.0"
+
+[[package]]
 name = "anyio"
 version = "4.9.0"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
@@ -1206,6 +1247,39 @@ files = [
     {file = "numpy-2.2.5-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:d2e3bdadaba0e040d1e7ab39db73e0afe2c74ae277f5614dad53eadbecbbb169"},
     {file = "numpy-2.2.5.tar.gz", hash = "sha256:a9c0d994680cd991b1cb772e8b297340085466a6fe964bc9d4e80f5e2f43c291"},
 ]
+
+[[package]]
+name = "ollama"
+version = "0.4.8"
+description = "The official Python client for Ollama."
+optional = false
+python-versions = "<4.0,>=3.8"
+groups = ["main"]
+files = [
+    {file = "ollama-0.4.8-py3-none-any.whl", hash = "sha256:04312af2c5e72449aaebac4a2776f52ef010877c554103419d3f36066fe8af4c"},
+    {file = "ollama-0.4.8.tar.gz", hash = "sha256:1121439d49b96fa8339842965d0616eba5deb9f8c790786cdf4c0b3df4833802"},
+]
+
+[package.dependencies]
+httpx = ">=0.27,<0.29"
+pydantic = ">=2.9.0,<3.0.0"
+
+[[package]]
+name = "ollama-haystack"
+version = "2.4.2"
+description = "An integration between the Ollama LLM framework and Haystack"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "ollama_haystack-2.4.2-py3-none-any.whl", hash = "sha256:5cf06f26de8461a65b9e141d14a51a3e2bc347265d479993a4d4a3fbb2d7e39e"},
+    {file = "ollama_haystack-2.4.2.tar.gz", hash = "sha256:137c8529673b026b2b98bc93bf891871c9df47ceb8530412ae5f942a5992c955"},
+]
+
+[package.dependencies]
+haystack-ai = "*"
+ollama = ">=0.4.0"
+pydantic = "*"
 
 [[package]]
 name = "openai"
@@ -2535,4 +2609,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "f4bc191db2d9da4189f2d62e202a374d544d4a7298271ee4c30d9e38f781c4b8"
+content-hash = "d6e27420c4a5d8b721c4da7c2f1d429d0a0712a273f1b792178e507a09eba876"
