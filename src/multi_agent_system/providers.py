@@ -6,7 +6,8 @@ from haystack.components.generators.chat import OpenAIChatGenerator
 from haystack_integrations.components.generators.anthropic import AnthropicChatGenerator
 from haystack_integrations.components.generators.ollama import OllamaChatGenerator
 
-LLM = OpenAIChatGenerator | AnthropicChatGenerator | OllamaChatGenerator    
+LLM = OpenAIChatGenerator | AnthropicChatGenerator | OllamaChatGenerator
+
 
 class LLMProvider:
 
