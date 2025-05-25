@@ -42,7 +42,7 @@ class SwarmAgent:
         new_messages = [agent_message]
 
         if agent_message.text:
-            print(f"{self.name}: {agent_message.text}")
+            print(f"\n{self.name}: {agent_message.text}")
 
         if not agent_message.tool_calls:
             return self.name, new_messages
