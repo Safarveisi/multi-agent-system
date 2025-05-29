@@ -23,6 +23,12 @@ dependencies = [
 [tool.poetry]
 package-mode = true
 
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
@@ -31,3 +37,4 @@ build-backend = "poetry.core.masonry.api"
 ipykernel = "^6.29.5"
 black = {extras = ["jupyter"], version = "^25.1.0"}
 rich = "^14.0.0"
+ruff = "^0.11.12"
