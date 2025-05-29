@@ -87,11 +87,11 @@ def calculate_fees(visa_type: Annotated[str, "The name of visa type"]) -> str:
         "work": "The fee for a work visa is 1000 Euro",
         "tourist": "The fee for a tourist visa is 200 Euro",
     }
-    
+
     return calculated_fee.get(
         visa_type_lowered,
         "The provided visa type is not recognized. "
-        "Please enter one of the following: 'student', 'work', or 'tourist'."
+        "Please enter one of the following: 'student', 'work', or 'tourist'.",
     )
 
 

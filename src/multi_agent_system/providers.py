@@ -1,5 +1,5 @@
 """
-This module contains the implementation of 
+This module contains the implementation of
 the LLM Provider class (e.g., OpenAI).
 """
 
@@ -13,7 +13,6 @@ LLM = OpenAIChatGenerator | AnthropicChatGenerator | OllamaChatGenerator
 
 
 class LLMProvider:
-
     def __init__(self, provider: str) -> None:
         self.provider = provider
         self.validate_provider()

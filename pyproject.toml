@@ -29,11 +29,13 @@ line-length = 88
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
 
+[tool.black]
+line-length = 88
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
-black = {extras = ["jupyter"], version = "^25.1.0"}
-ruff = "^0.11.12"
+pre-commit = "^4.2.0"
