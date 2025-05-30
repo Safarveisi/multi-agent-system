@@ -32,9 +32,3 @@ repos:
     # Run the formatter.
     - id: ruff-format
       types_or: [ python, pyi ]
-
-- repo: https://github.com/psf/black-pre-commit-mirror
-  rev: 25.1.0
-  hooks:
-    - id: black
-      types_or: [ python, pyi ]
