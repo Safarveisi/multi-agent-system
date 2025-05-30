@@ -96,7 +96,21 @@ jobs:
          - name: Checkout repository
            uses: actions/checkout@v4
 
-         - name: Push tags
-           if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+         - name: Extract package version from pyproject.toml
+           id: get_version
            run: |
-            git push origin --tags
+              VERSION=$(poetry version -s)
+              echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+
+         - name: Push the tag
+           uses: actions/github-script@v7
+           if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+           with:
+              github-token: ${{ secrets.FG_REPOSITORY_SCOPED_TOKEN }}
+              script: |
+                github.rest.git.createRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: 'refs/tags/${{steps.get_version.outputs.version}}',
+                  sha: context.sha
+                })
