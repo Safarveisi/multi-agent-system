@@ -9,7 +9,7 @@ on:
     workflow_dispatch:
 jobs:
 
-    tag-check:
+    version-check:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
@@ -45,7 +45,7 @@ jobs:
               run: |
                 git tag ${{ steps.get_version.outputs.version }}
 
-    linting:
+    lint-format-and-static-code-check:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout repository
@@ -85,3 +85,18 @@ jobs:
             - name: Linting with pre-commit
               run: |
                 poetry run pre-commit run --all-files
+
+
+    push-tag:
+      needs:
+        - version-check
+        - lint-format-and-static-code-check
+      runs-on: ubuntu-latest
+      steps:
+         - name: Checkout repository
+           uses: actions/checkout@v4
+
+         - name: Push tags
+           if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+           run: |
+            git push origin --tags
