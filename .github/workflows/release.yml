@@ -35,15 +35,18 @@ jobs:
               run: pip install poetry
 
             - name: Extract package version from pyproject.toml
-              id: get_version
               run: |
                 VERSION=$(poetry version -s)
-                echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
-                echo "Package version: $VERSION"
+                echo $VERSION > version.txt
+
+            - uses: actions/upload-artifact@v4
+              with:
+                name: version-file
+                path: ./version.txt
 
             - name: Check for existing tag
               run: |
-                git tag ${{ steps.get_version.outputs.version }}
+                git tag v$(cat version.txt)
 
     lint-format-and-static-code-check:
         runs-on: ubuntu-latest
@@ -96,11 +99,17 @@ jobs:
          - name: Checkout repository
            uses: actions/checkout@v4
 
-         - name: Extract package version from pyproject.toml
+         - name: Download the version file
+           uses: actions/download-artifact@v4
+           with:
+              name: version-file
+              path: ./version.txt
+
+         - name: Get version from file
            id: get_version
            run: |
-              VERSION=$(poetry version -s)
-              echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+              VERSION=$(cat version.txt)
+              echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
          - name: Push the tag
            uses: actions/github-script@v7
@@ -111,6 +120,6 @@ jobs:
                 github.rest.git.createRef({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  ref: 'refs/tags/${{steps.get_version.outputs.version}}',
+                  ref: 'refs/tags/v${{steps.get_version.outputs.version}}',
                   sha: context.sha
                 })
