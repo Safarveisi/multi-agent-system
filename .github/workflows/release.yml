@@ -32,7 +32,6 @@ jobs:
                   ${{ runner.os }}-pip-
 
             - name: Install Poetry
-              if: steps.cache-pip.outputs.cache-hit != 'true'
               run: pip install poetry
 
             - name: Extract package version from pyproject.toml
@@ -76,7 +75,6 @@ jobs:
                   ${{ runner.os }}-pypoetry-
 
             - name: Install Poetry
-              if: steps.cache-pip.outputs.cache-hit != 'true'
               run: pip install poetry
 
             - name: Create poetry virtual env
