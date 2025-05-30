@@ -1,0 +1,32 @@
+name: Tag Check
+
+on:
+    pull_request:
+      types: [opened, synchronize]
+    push:
+        branches:
+            - master
+    workflow_dispatch:
+jobs:
+    tag-check: 
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+            
+            - name: Install Poetry
+              run: |
+                pip install poetry
+
+            - name: Extract package version from pyproject.toml
+              id: get_version
+              run: |
+                VERSION=$(poetry version -s)
+                echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                echo "Package version: $VERSION"
+
+            - name: Check for existing tag
+              run: |
+                git tag ${{ steps.get_version.outputs.version }}
