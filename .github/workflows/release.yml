@@ -17,7 +17,22 @@ jobs:
               with:
                 fetch-depth: 0
 
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.11'
+
+            - name: Cache pip packages
+              uses: actions/cache@v4
+              id: cache-pip
+              with:
+                path: ~/.cache/pip
+                key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+                restore-keys: |
+                  ${{ runner.os }}-pip-
+
             - name: Install Poetry
+              if: steps.cache-pip.outputs.cache-hit != 'true'
               run: |
                 pip install poetry
 
@@ -38,11 +53,39 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.11'
+
+            - name: Cache pip packages
+              uses: actions/cache@v4
+              id: cache-pip
+              with:
+                path: ~/.cache/pip
+                key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+                restore-keys: |
+                  ${{ runner.os }}-pip-
+
+            - name: Cache poetry packages
+              uses: actions/cache@v4
+              id: cache-pypoetry
+              with:
+                path: .venv
+                key: ${{ runner.os }}-pypoetry-${{ hashFiles('**/pyproject.toml') }}
+                restore-keys: |
+                  ${{ runner.os }}-pypoetry-
+
             - name: Install Poetry
+              if: steps.cache-pip.outputs.cache-hit != 'true'
               run: |
                 pip install poetry
 
+            - name: Create poetry virtual env
+              if: steps.cache-pypoetry.outputs.cache-hit != 'true'
+              run: |
+                poetry config virtualenvs.in-project true
+                poetry install --only dev
             - name: Linting with pre-commit
               run: |
-                poetry install --only dev
                 poetry run pre-commit run --all-files
