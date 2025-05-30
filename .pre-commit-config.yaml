@@ -1,0 +1,34 @@
+repos:
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+    # Check for trailing whitespace.
+    - id: trailing-whitespace
+      types_or: [ text, markdown, python, pyi ]
+    # Check for end of file with newline.
+    - id: end-of-file-fixer
+      types_or: [ text, markdown, python, pyi ]
+    # Check for files with no executable bit.
+    - id: check-executables-have-shebangs
+      types_or: [ text, markdown, python, pyi ]
+    # Check for YAML syntax errors.
+    - id: check-yaml
+      types_or: [ yaml ]
+    - id: check-added-large-files
+      types_or: [ text, markdown, python, pyi ]
+    - id : check-merge-conflict
+      types_or: [ text, markdown, python, pyi ]
+    - id: check-toml
+      types_or: [ toml ]
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.11.12
+  hooks:
+    # Run the linter.
+    - id: ruff-check
+      types_or: [ python, pyi ]
+    # Run the formatter.
+    - id: ruff-format
+      types_or: [ python, pyi ]

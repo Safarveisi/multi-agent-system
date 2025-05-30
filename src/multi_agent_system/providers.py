@@ -1,6 +1,9 @@
-"""This module contains the implementation of the LLM Provider class (e.g., OpenAI)."""
+"""
+This module contains the implementation of
+the LLM Provider class (e.g., OpenAI).
+"""
 
-from typing import Dict, Any
+from typing import Any
 
 from haystack.components.generators.chat import OpenAIChatGenerator
 from haystack_integrations.components.generators.anthropic import AnthropicChatGenerator
@@ -10,7 +13,6 @@ LLM = OpenAIChatGenerator | AnthropicChatGenerator | OllamaChatGenerator
 
 
 class LLMProvider:
-
     def __init__(self, provider: str) -> None:
         self.provider = provider
         self.validate_provider()
@@ -21,7 +23,7 @@ class LLMProvider:
                 "provider should be either 'openai', 'anthropic', or 'ollama'"
             )
 
-    def connect(self, **kwargs: Dict[str, Any]) -> LLM:
+    def connect(self, **kwargs: dict[str, Any]) -> LLM:
         if self.provider == "openai":
             return OpenAIChatGenerator(**kwargs)
         elif self.provider == "anthropic":

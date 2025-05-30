@@ -1,12 +1,18 @@
+"""
+This module contains the
+implementation of the Swarm Agent.
+"""
+
 import random
 import re
-from typing import Callable, Tuple, List, Optional
+from collections.abc import Callable
 from dataclasses import dataclass
 
-from multi_agent_system.providers import LLM
+from haystack.components.tools import ToolInvoker
 from haystack.dataclasses import ChatMessage
 from haystack.tools import create_tool_from_function
-from haystack.components.tools import ToolInvoker
+
+from multi_agent_system.providers import LLM
 
 HANDOFF_PATTERN = r"Transferred to: (.*?)(?:\.|$)"
 
@@ -17,7 +23,7 @@ class SwarmAgent:
     name: str
     llm: LLM
     instructions: str
-    functions: Optional[List[Callable]] = None
+    functions: list[Callable] | None = None
 
     def __post_init__(self):
         # General description of the agent's tasks and capabilities
@@ -34,7 +40,7 @@ class SwarmAgent:
             else None
         )
 
-    def run(self, messages: List[ChatMessage]) -> Tuple[str, List[ChatMessage]]:
+    def run(self, messages: list[ChatMessage]) -> tuple[str, list[ChatMessage]]:
         # Generate response
         agent_message = self.llm.run(
             messages=[self._system_message] + messages, tools=self.tools

@@ -1,2 +1,2 @@
-[virtualsenvs]
-in-project=true
+[virtualenvs]
+in-project = true
