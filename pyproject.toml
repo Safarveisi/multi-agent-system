@@ -1,6 +1,6 @@
 [project]
 name = "multi-agent-system"
-version = "1.2.0"
+version = "1.3.0"
 description = "A multi-agent system that handles visa applications"
 authors = [
     {name = "Safarveisi",email = "sajad.safarveisi@gmail.com"},
