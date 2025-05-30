@@ -103,13 +103,13 @@ jobs:
            uses: actions/download-artifact@v4
            with:
               name: version-file
-              path: ./version.txt
 
          - name: Get version from file
            id: get_version
            run: |
               VERSION=$(cat version.txt)
               echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+              echo "Package version: $VERSION"
 
          - name: Push the tag
            uses: actions/github-script@v7
