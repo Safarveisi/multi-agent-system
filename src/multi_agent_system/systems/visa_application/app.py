@@ -1,10 +1,13 @@
 import streamlit as st
 from haystack.dataclasses import ChatMessage, ChatRole
-from setup import status_agent
 
-st.set_page_config(page_title="Visa Status Assistant", layout="wide")
+from multi_agent_system.systems.visa_application.setup import (
+    status_agent,
+)
 
-st.title("Visa Status Agent")
+st.set_page_config(page_title="Visa Application System", layout="wide")
+
+st.title("Visa Application System")
 
 # Initialize session state
 if "messages" not in st.session_state:
@@ -13,13 +16,13 @@ if "messages" not in st.session_state:
 # Display chat history
 for msg in st.session_state.messages:
     if msg.role == ChatRole.USER:
-        st.chat_message("user").markdown(msg.text)
+        st.chat_message("User").markdown(msg.text)
     elif msg.role == ChatRole.ASSISTANT:
-        st.chat_message("assistant").markdown(msg.text)
+        st.chat_message("Assistant").markdown(msg.text)
     elif msg.role == ChatRole.TOOL:
         tool_result = msg.tool_call_result
         if tool_result:
-            st.chat_message("assistant").markdown(
+            st.chat_message("Assistant").markdown(
                 f"**Tool response:**\n\n{tool_result.result}"
             )
 
@@ -28,11 +31,9 @@ for msg in st.session_state.messages:
 user_input = st.chat_input("Ask about your visa application...")
 
 if user_input:
-
     user_msg = ChatMessage.from_user(user_input)
     st.session_state.messages.append(user_msg)
     st.chat_message("user").markdown(user_input)
-
 
     new_agent, new_messages = status_agent.run(st.session_state.messages)
     st.session_state.messages.extend(new_messages)
