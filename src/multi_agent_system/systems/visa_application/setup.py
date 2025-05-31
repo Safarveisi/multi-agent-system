@@ -1,4 +1,7 @@
-"""This module implements the agents as well as their tools for the Visa Application System."""
+"""
+This module implements the agents as well as
+their tools for the Visa Application system.
+"""
 
 import random
 from datetime import datetime
@@ -6,9 +9,8 @@ from typing import Annotated
 
 from haystack.utils import Secret
 
-from multi_agent_system.providers import LLMProvider
 from multi_agent_system.agents import SwarmAgent
-
+from multi_agent_system.providers import LLMProvider
 
 APPLICATION_STATUS = ["IN PROCESS", "APPROVED", "REJECTED", "CANCELLED"]
 REJECTION_REASONS = [
@@ -31,7 +33,8 @@ def check_status(
 
     # Base message
     message = (
-        f"Report: Applicant '{applicant_name}' with tracking number '{tracking_number}' found successfully.\n"
+        f"Report: Applicant '{applicant_name}' with "
+        f"tracking number '{tracking_number}' found successfully.\n"
         f"Application Status: {status}."
     )
 
@@ -53,7 +56,10 @@ def execute_cancellation(
     confirm = input("Confirm cancellation? (y/n): ").strip().lower()
     if confirm == "y":
         print("Cancellation confirmed.")
-        return f"Cancellation for tracking number {tracking_number} has been successfully processed!"
+        return (
+            f"Cancellation for tracking number {tracking_number} "
+            "has been successfully processed!"
+        )
     else:
         print("Cancellation aborted.")
         return "Cancellation aborted."
@@ -76,14 +82,17 @@ def transfer_to_finance() -> str:
 
 def calculate_fees(visa_type: Annotated[str, "The name of visa type"]) -> str:
     visa_type_lowered = visa_type.lower()
-    if visa_type_lowered == "student":
-        return "The fee for a student visa is 500 Euro."
-    elif visa_type_lowered == "work":
-        return "The fee for a work visa is 1000 Euro."
-    elif visa_type_lowered == "tourist":
-        return "The fee for a tourist visa is 200 Euro."
-    else:
-        return "Visa type not recognized. Please try again!"
+    calculated_fee = {
+        "student": "The fee for a student visa is 500 Euro",
+        "work": "The fee for a work visa is 1000 Euro",
+        "tourist": "The fee for a tourist visa is 200 Euro",
+    }
+
+    return calculated_fee.get(
+        visa_type_lowered,
+        "The provided visa type is not recognized. "
+        "Please enter one of the following: 'student', 'work', or 'tourist'.",
+    )
 
 
 # Introduce the LLM provider and connect to it
@@ -101,15 +110,25 @@ status_agent = SwarmAgent(
     llm=llm,
     instructions=(
         "You are a Status Agent at German Embassy in Iran. "
-        "1. Help the applicant with his application's status and executing cancellations. "
+        "1. Help the applicant with his application's status "
+        "and executing cancellations. "
         "2. Ask for basic information like name and tracking number. "
         "3. If the status is 'REJECTED', inform the applicant about the reason. "
-        "4. If the status is 'CANCELLED', inform the applicant about the cancellation date. "
-        "5. If the applicant requires about cancellation of his application, ask for the tracking number and process the cancellation. "
-        "6. Only after a successful cancellation, tell them that they cannot apply for the same visa type again within 6 months. "
-        "7. If the applicant is interested in the fees for different types of visas, send him to Finance Agent. "
-        "8. If the applicant is interested in the necessary application documents, send him to Eligibility Agent. "
-        "9. Make tool calls only if necessary and make sure to provide the right arguments."
+        "4. If the status is 'CANCELLED', inform the applicant "
+        "about the cancellation date. "
+        "5. If the applicant requires about cancellation of "
+        "his application, ask for the tracking number "
+        "and process the cancellation. "
+        "6. Only after a successful cancellation, tell them "
+        "that they cannot apply "
+        "for the same visa type again within 6 months. "
+        "7. If the applicant is interested in the fees for "
+        "different types of visas, "
+        "send him to Finance Agent. "
+        "8. If the applicant is interested in the necessary "
+        "application documents, send him to Eligibility Agent. "
+        "9. Make tool calls only if necessary and make sure to provide "
+        "the right arguments."
     ),
     functions=[
         check_status,
@@ -125,10 +144,13 @@ eligibility_agent = SwarmAgent(
     instructions=(
         "You are an Eligibility Agent at the German Embassy in Iran. "
         "1. Provide the applicant with the list of necessary application documents. "
-        "2. There are three types of visa ('student', 'work', 'tourist') and for each you can make up a list of required documents. "
+        "2. There are three types of visa ('student', 'work', 'tourist') and for "
+        "each you can make up a list of required documents. "
         "3. Ask for the type of visa before generating any response. "
-        "4. If the applicant asks questions related to status of his application, send him to Status Agent. "
-        "5. If the applicant is interested in the fees for different types of visas, send him to Finance Agent. "
+        "4. If the applicant asks questions related to status of his application, "
+        "send him to Status Agent. "
+        "5. If the applicant is interested in the fees for different types of visas, "
+        "send him to Finance Agent. "
         "6. Make tool calls only if necessary."
     ),
     functions=[transfer_to_status, transfer_to_finance],
@@ -139,14 +161,22 @@ finance_agent = SwarmAgent(
     llm=llm,
     instructions=(
         "You are a Finance Agent at the German Embassy in Iran. "
-        "1. You provide the applicant with information about fees (in Euro) for different types of visas. "
-        "2. Ask for the type of the visa the applicant applied for. It could be of type 'student', 'work', or 'tourist'. "
-        "3. Do not make up fees for visa types and always make proper tool calls to calculate the fee. "
-        "4. If the provided visa type by the applicant is not among the three, ask again the user to enter the visa type. "
-        "5. If applicant is interested in the status of his application, send him to Status Agent. "
-        "6. If the applicant looks for application documents, send him to Eligibility Agent. "
-        "7. Make tool calls only if necessary and make sure to provide the right arguments. "
-        "8. Always return a reponse to the applicant whenever he asks a question."
+        "1. You provide the applicant with information about fees "
+        "(in Euro) for different types of visas. "
+        "2. Ask for the type of the visa the applicant applied for. "
+        "It could be of type 'student', 'work', or 'tourist'. "
+        "3. Do not make up fees for visa types and always make proper "
+        "tool calls to calculate the fee. "
+        "4. If the provided visa type by the applicant is not among the "
+        "three, ask again the user to enter the visa type. "
+        "5. If applicant is interested in the status of his "
+        "application, send him to Status Agent. "
+        "6. If the applicant looks for application "
+        "documents, send him to Eligibility Agent. "
+        "7. Make tool calls only if necessary and make sure "
+        "to provide the right arguments. "
+        "8. Always return a reponse to the applicant "
+        "whenever he asks a question."
     ),
     functions=[transfer_to_status, transfer_to_eligibility, calculate_fees],
 )

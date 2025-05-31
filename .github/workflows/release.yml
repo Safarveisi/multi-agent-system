@@ -1,0 +1,125 @@
+name: Tag Check and Linting
+
+on:
+    pull_request:
+      types: [opened, synchronize]
+    push:
+        branches:
+            - master
+    workflow_dispatch:
+jobs:
+
+    version-check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.11'
+
+            - name: Cache pip packages
+              id: cache-pip
+              uses: actions/cache@v4
+              with:
+                path: ~/.cache/pip
+                key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+                restore-keys: |
+                  ${{ runner.os }}-pip-
+
+            - name: Install Poetry
+              run: pip install poetry
+
+            - name: Extract package version from pyproject.toml
+              run: |
+                VERSION=$(poetry version -s)
+                echo $VERSION > version.txt
+
+            - uses: actions/upload-artifact@v4
+              with:
+                name: version-file
+                path: ./version.txt
+
+            - name: Check for existing tag
+              run: |
+                git tag v$(cat version.txt)
+
+    lint-format-and-static-code-check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.11'
+
+            - name: Cache pip packages
+              id: cache-pip
+              uses: actions/cache@v4
+              with:
+                path: ~/.cache/pip
+                key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml') }}
+                restore-keys: |
+                  ${{ runner.os }}-pip-
+
+            - name: Cache poetry packages
+              id: cache-pypoetry
+              uses: actions/cache@v4
+              with:
+                path: .venv
+                key: ${{ runner.os }}-pypoetry-${{ hashFiles('**/pyproject.toml') }}
+                restore-keys: |
+                  ${{ runner.os }}-pypoetry-
+
+            - name: Install Poetry
+              run: pip install poetry
+
+            - name: Create poetry virtual env
+              if: steps.cache-pypoetry.outputs.cache-hit != 'true'
+              run: |
+                poetry config virtualenvs.in-project true
+                poetry install --only dev
+            - name: Linting with pre-commit
+              run: |
+                poetry run pre-commit run --all-files
+
+
+    push-tag:
+      needs:
+        - version-check
+        - lint-format-and-static-code-check
+      runs-on: ubuntu-latest
+      steps:
+         - name: Checkout repository
+           uses: actions/checkout@v4
+
+         - name: Download the version file
+           uses: actions/download-artifact@v4
+           with:
+              name: version-file
+
+         - name: Get version from file
+           id: get_version
+           run: |
+              VERSION=$(cat version.txt)
+              echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+              echo "Package version: $VERSION"
+
+         - name: Push the tag
+           uses: actions/github-script@v7
+           if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+           with:
+              github-token: ${{ secrets.FG_REPOSITORY_SCOPED_TOKEN }}
+              script: |
+                github.rest.git.createRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: 'refs/tags/v${{steps.get_version.outputs.version}}',
+                  sha: context.sha
+                })
