@@ -29,42 +29,32 @@ agent = agents[st.session_state.current_agent_name]
 # Display chat history
 for msg in st.session_state.messages:
     if msg.role == ChatRole.USER:
-        st.chat_message("user").markdown(msg.text)
-    elif msg.role == ChatRole.ASSISTANT:
-        st.chat_message("assistant").markdown(msg.text)
-    elif msg.role == ChatRole.TOOL:
-        tool_result = msg.tool_call_result
-        if tool_result:
-            st.chat_message("assistant").markdown(
-                f"**Tool response:**\n\n{tool_result.result}"
-            )
-
+        st.chat_message("User").markdown(msg.text)
+    else:  # If the role is not USER, it must be ASSISTANT or TOOL
+        if msg.text:  # Only display if there's text
+            st.chat_message("Assistant").markdown(
+                msg.text
+            )  # Skip TOOL messages for now
 
 # Chat input
-user_input = st.chat_input("Ask about your visa application...")
+user_input = st.chat_input("Ask visa related questions...")
 
 if user_input:
-    user_msg = ChatMessage.from_user(user_input)
-    st.session_state.messages.append(user_msg)
-    st.chat_message("user").markdown(user_input)
+    st.session_state.messages.append(ChatMessage.from_user(user_input))
+    st.chat_message("User").markdown(user_input)
 
     # Run agent
-    new_agent, new_messages = agent.run(st.session_state.messages)
+    run_result = agent.run(st.session_state.messages)
+    if run_result["current_agent_message"] is not None:
+        st.chat_message("Assistant").markdown(run_result["current_agent_message"])
+
+    # Update messages and agent
+    new_agent_name, new_messages = (
+        run_result["new_agent_name"],
+        run_result["new_messages"],
+    )
     st.session_state.messages.extend(new_messages)
 
-    # Update agent if it changed
-    if new_agent != st.session_state.current_agent_name:
-        st.session_state.current_agent_name = new_agent
-        st.markdown(f"🆕 **Switched to: {new_agent}**")
-
-    # Display agent messages
-    for i, msg in enumerate(new_messages):
-        print(f"[DEBUG] Message {i}: role={msg.role}, text={msg.text}")
-        if msg.role == ChatRole.ASSISTANT:
-            st.chat_message("assistant").markdown(msg.text)
-        elif msg.role == ChatRole.TOOL:
-            tool_result = msg.tool_call_result
-            if tool_result:
-                st.chat_message("assistant").markdown(
-                    f"**Tool response:**\n\n{tool_result.result}"
-                )
+    if new_agent_name != st.session_state.current_agent_name:
+        st.session_state.current_agent_name = new_agent_name
+        st.markdown(f"🆕 **Switched to: {new_agent_name}**")

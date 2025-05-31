@@ -50,19 +50,15 @@ def check_status(
 
 def execute_cancellation(
     tracking_number: Annotated[str, "The tracking number of the application to cancel"],
+    reason: Annotated[str, "The reason for cancellation"],
 ) -> str:
     """Only call this if explicitly asked to."""
-    print("Tracking number for cancellation:", tracking_number)
-    confirm = input("Confirm cancellation? (y/n): ").strip().lower()
-    if confirm == "y":
-        print("Cancellation confirmed.")
-        return (
-            f"Cancellation for tracking number {tracking_number} "
-            "has been successfully processed!"
-        )
-    else:
-        print("Cancellation aborted.")
-        return "Cancellation aborted."
+
+    return (
+        f"Cancellation for tracking number {tracking_number} "
+        "has been successfully processed! "
+        f"Reason: {reason}. "
+    )
 
 
 def transfer_to_status() -> str:
@@ -117,17 +113,17 @@ status_agent = SwarmAgent(
         "4. If the status is 'CANCELLED', inform the applicant "
         "about the cancellation date. "
         "5. If the applicant requires about cancellation of "
-        "his application, ask for the tracking number "
-        "and process the cancellation. "
-        "6. Only after a successful cancellation, tell them "
-        "that they cannot apply "
-        "for the same visa type again within 6 months. "
-        "7. If the applicant is interested in the fees for "
-        "different types of visas, "
-        "send him to Finance Agent. "
-        "8. If the applicant is interested in the necessary "
+        "his application, ask for the tracking number and the reason"
+        "and process the cancellation. Please ask the applicant "
+        "if he is sure about the cancellation before processing it. "
+        "This is very important because cancellation is irreversible. "
+        "After the cancellation, inform the applicant about the reason "
+        "and that they cannot apply for the same visa type again within 6 months. "
+        "6. If the applicant is interested in the fees for "
+        "different types of visas, send him to Finance Agent. "
+        "7. If the applicant is interested in the necessary "
         "application documents, send him to Eligibility Agent. "
-        "9. Make tool calls only if necessary and make sure to provide "
+        "8. Make tool calls only if necessary and make sure to provide "
         "the right arguments."
     ),
     functions=[
