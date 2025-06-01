@@ -57,7 +57,7 @@ def execute_cancellation(
     return (
         f"Cancellation for tracking number {tracking_number} "
         "has been successfully processed! "
-        f"Reason: {reason}. "
+        f"Reason: {reason}."
     )
 
 
