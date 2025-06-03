@@ -7,6 +7,7 @@ import random
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any
 
 from haystack.components.tools import ToolInvoker
 from haystack.dataclasses import ChatMessage
@@ -40,18 +41,24 @@ class SwarmAgent:
             else None
         )
 
-    def run(self, messages: list[ChatMessage]) -> tuple[str, list[ChatMessage]]:
+    def run(self, messages: list[ChatMessage]) -> dict[str, Any]:
         # Generate response
         agent_message = self.llm.run(
             messages=[self._system_message] + messages, tools=self.tools
         )["replies"][0]
         new_messages = [agent_message]
 
-        if agent_message.text:
-            print(f"\n{self.name}: {agent_message.text}")
+        run_result = {
+            "new_agent_name": self.name,
+            "new_messages": new_messages,
+            "current_agent_name": self.name,
+            "current_agent_message": (
+                agent_message.text if agent_message.text else None
+            ),
+        }
 
         if not agent_message.tool_calls:
-            return self.name, new_messages
+            return run_result
 
         # Handle tool calls
         for tc in agent_message.tool_calls:
@@ -59,11 +66,11 @@ class SwarmAgent:
             if tc.id is None:
                 tc.id = str(random.randint(0, 1000000))
         tool_results = self._tool_invoker.run(messages=[agent_message])["tool_messages"]
-        new_messages.extend(tool_results)
+        run_result["new_messages"].extend(tool_results)
 
         # Handoff (handing over to another agent)
         last_result = tool_results[-1].tool_call_result.result
         match = re.search(HANDOFF_PATTERN, last_result)
-        new_agent_name = match.group(1) if match else self.name
+        run_result["new_agent_name"] = match.group(1) if match else self.name
 
-        return new_agent_name, new_messages
+        return run_result
