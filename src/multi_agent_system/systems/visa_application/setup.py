@@ -93,10 +93,18 @@ def calculate_fees(visa_type: Annotated[str, "The name of visa type"]) -> str:
 
 # Introduce the LLM provider and connect to it
 provider = "openai"
-params = {
-    "api_key": Secret.from_env_var("API_KEY_OPENAI"),
-    "model": "gpt-4o-mini",
-}
+if provider == "openai":
+    params = {
+        "api_key": Secret.from_env_var("API_KEY_OPENAI"),
+        "model": "gpt-4o-mini",
+    }
+elif provider == "gemini":
+    params = {
+        "api_key": Secret.from_env_var("GOOGLE_API_KEY"),
+        "model": "gemini-2.0-flash",      
+    }        
+ 
+print( Secret.from_env_var("GOOGLE_API_KEY")) 
 
 llm = LLMProvider(provider=provider).connect(**params)
 
