@@ -20,7 +20,6 @@ LLM = (
 )
 
 
-
 class LLMProvider:
     def __init__(self, provider: str) -> None:
         self.provider = provider
