@@ -1,6 +1,6 @@
 [project]
 name = "multi-agent-system"
-version = "1.4.0"
+version = "1.5.0"
 description = "A multi-agent system that handles visa applications"
 authors = [
     {name = "Safarveisi",email = "sajad.safarveisi@gmail.com"},
@@ -37,4 +37,3 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
 pre-commit = "^4.2.0"
-ruff = "^0.11.13"
