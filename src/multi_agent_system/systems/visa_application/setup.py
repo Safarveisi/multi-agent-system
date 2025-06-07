@@ -170,7 +170,7 @@ finance_agent = SwarmAgent(
         "documents, send him to Eligibility Agent. "
         "7. Make tool calls only if necessary and make sure "
         "to provide the right arguments. "
-        "8. Always return a reponse to the applicant "
+        "8. Always return a response to the applicant "
         "whenever he asks a question."
     ),
     functions=[transfer_to_status, transfer_to_eligibility, calculate_fees],
