@@ -12,6 +12,12 @@ from haystack.utils import Secret
 from multi_agent_system.agents import SwarmAgent
 from multi_agent_system.providers import LLMProvider
 
+LLM_PROVIDER = "openai"
+# Connection parameters for the LLM provider
+CONN_PARAMS = {
+    "api_key": Secret.from_env_var("API_KEY_OPENAI"),
+    "model": "gpt-4o-mini",
+}
 APPLICATION_STATUS = ["IN PROCESS", "APPROVED", "REJECTED", "CANCELLED"]
 REJECTION_REASONS = [
     "missing documents",
@@ -91,14 +97,7 @@ def calculate_fees(visa_type: Annotated[str, "The name of visa type"]) -> str:
     )
 
 
-# Introduce the LLM provider and connect to it
-provider = "openai"
-params = {
-    "api_key": Secret.from_env_var("API_KEY_OPENAI"),
-    "model": "gpt-4o-mini",
-}
-
-llm = LLMProvider(provider=provider).connect(**params)
+llm = LLMProvider(provider=LLM_PROVIDER).connect(**CONN_PARAMS)
 
 # Define the agents with their respective instructions and tools
 status_agent = SwarmAgent(
