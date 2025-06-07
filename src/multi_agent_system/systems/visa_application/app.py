@@ -11,9 +11,7 @@ agents = {
     agent.name: agent for agent in [status_agent, eligibility_agent, finance_agent]
 }
 
-
 st.set_page_config(page_title="Visa Application Assistant", layout="wide")
-
 
 st.title("Visa Application Assistant")
 
@@ -45,16 +43,33 @@ if user_input:
 
     # Run agent
     run_result = agent.run(st.session_state.messages)
-    if run_result["current_agent_message"] is not None:
+    if run_result["current_agent_message"] is not None:  # It may be a tool call
         st.chat_message("Assistant").markdown(run_result["current_agent_message"])
 
-    # Update messages and agent
-    new_agent_name, new_messages = (
-        run_result["new_agent_name"],
-        run_result["new_messages"],
-    )
-    st.session_state.messages.extend(new_messages)
+    if (
+        run_result["new_messages"]
+        and run_result["new_messages"][-1].role == ChatRole.TOOL
+    ):
+        # Update messages and agent
+        new_agent_name, new_messages = (
+            run_result["new_agent_name"],
+            run_result["new_messages"],
+        )
+        run_result = agent.run(st.session_state.messages + new_messages)
+        st.session_state.messages.extend(run_result["new_messages"])
+        st.session_state.messages.extend(new_messages)
+        st.chat_message("Assistant").markdown(run_result["current_agent_message"])
+        if st.session_state.current_agent_name != new_agent_name:
+            st.session_state.current_agent_name = new_agent_name
+            agent = agents[st.session_state.current_agent_name]
 
-    if new_agent_name != st.session_state.current_agent_name:
-        st.session_state.current_agent_name = new_agent_name
-        st.markdown(f"🆕 **Switched to: {new_agent_name}**")
+            run_result = agent.run(st.session_state.messages)
+            st.session_state.messages.extend(run_result["new_messages"])
+            st.chat_message("Assistant").markdown(run_result["current_agent_message"])
+    else:
+        # Update messages and agent
+        new_agent_name, new_messages = (
+            run_result["new_agent_name"],
+            run_result["new_messages"],
+        )
+        st.session_state.messages.extend(new_messages)
