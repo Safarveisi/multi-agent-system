@@ -7,7 +7,7 @@ import random
 from datetime import datetime
 from typing import Annotated
 
-from haystack.utils import Secret
+from haystack.utils import Secret  # type: ignore
 
 from multi_agent_system.agents import SwarmAgent
 from multi_agent_system.providers import LLMProvider
