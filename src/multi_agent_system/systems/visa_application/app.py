@@ -35,7 +35,9 @@ for msg in st.session_state.messages:
             )  # Skip TOOL messages for now
 
 # Chat input
-user_input = st.chat_input("Ask visa related questions...")
+user_input = st.chat_input(
+    "Ask visa related questions (e.g. 'What is the status of my application?')"
+)
 
 if user_input:
     st.session_state.messages.append(ChatMessage.from_user(user_input))
@@ -46,15 +48,13 @@ if user_input:
     if run_result["current_agent_message"] is not None:  # It may be a tool call
         st.chat_message("Assistant").markdown(run_result["current_agent_message"])
 
-    if (
-        run_result["new_messages"]
-        and run_result["new_messages"][-1].role == ChatRole.TOOL
-    ):
-        # Update messages and agent
-        new_agent_name, new_messages = (
-            run_result["new_agent_name"],
-            run_result["new_messages"],
-        )
+    # Update messages and agent
+    new_agent_name, new_messages = (
+        run_result["new_agent_name"],
+        run_result["new_messages"],
+    )
+
+    if new_messages and new_messages[-1].role == ChatRole.TOOL:
         run_result = agent.run(st.session_state.messages + new_messages)
         st.session_state.messages.extend(run_result["new_messages"])
         st.session_state.messages.extend(new_messages)
@@ -67,9 +67,4 @@ if user_input:
             st.session_state.messages.extend(run_result["new_messages"])
             st.chat_message("Assistant").markdown(run_result["current_agent_message"])
     else:
-        # Update messages and agent
-        new_agent_name, new_messages = (
-            run_result["new_agent_name"],
-            run_result["new_messages"],
-        )
         st.session_state.messages.extend(new_messages)
