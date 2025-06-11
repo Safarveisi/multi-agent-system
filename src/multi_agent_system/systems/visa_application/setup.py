@@ -7,7 +7,7 @@ import random
 from datetime import datetime
 from typing import Annotated
 
-from haystack.utils import Secret
+from haystack.utils import Secret  # type: ignore
 
 from multi_agent_system.agents import SwarmAgent
 from multi_agent_system.providers import LLMProvider
@@ -97,6 +97,23 @@ def calculate_fees(visa_type: Annotated[str, "The name of visa type"]) -> str:
     )
 
 
+def visa_application_documents(
+    visa_type: Annotated[str, "The type of visa to get documents for"],
+) -> str:
+    visa_type_lowered = visa_type.lower()
+    documents = {
+        "student": "1. Passport\n2. Admission letter\n3. Financial proof",
+        "work": "1. Passport\n2. Job offer letter\n3. Financial proof",
+        "tourist": "1. Passport\n2. Travel itinerary\n3. Financial proof",
+    }
+
+    return documents.get(
+        visa_type_lowered,
+        "The provided visa type is not recognized. "
+        "Please enter one of the following: 'student', 'work', or 'tourist'.",
+    )
+
+
 llm = LLMProvider(provider=LLM_PROVIDER).connect(**CONN_PARAMS)
 
 # Define the agents with their respective instructions and tools
@@ -140,7 +157,8 @@ eligibility_agent = SwarmAgent(
         "You are an Eligibility Agent at the German Embassy in Iran. "
         "1. Provide the applicant with the list of necessary application documents. "
         "2. There are three types of visa ('student', 'work', 'tourist') and for "
-        "each you can make up a list of required documents. "
+        "each you do not make up documents and always make proper "
+        "tool calls to get the list of required documents. "
         "3. Ask for the type of visa before generating any response. "
         "4. If the applicant asks questions related to status of his application or "
         "cancellation, send him to Status Agent. "
@@ -148,7 +166,7 @@ eligibility_agent = SwarmAgent(
         "send him to Finance Agent. "
         "6. Make tool calls only if necessary."
     ),
-    functions=[transfer_to_status, transfer_to_finance],
+    functions=[transfer_to_status, transfer_to_finance, visa_application_documents],
 )
 
 finance_agent = SwarmAgent(
@@ -170,7 +188,7 @@ finance_agent = SwarmAgent(
         "documents, send him to Eligibility Agent. "
         "7. Make tool calls only if necessary and make sure "
         "to provide the right arguments. "
-        "8. Always return a reponse to the applicant "
+        "8. Always return a response to the applicant "
         "whenever he asks a question."
     ),
     functions=[transfer_to_status, transfer_to_eligibility, calculate_fees],

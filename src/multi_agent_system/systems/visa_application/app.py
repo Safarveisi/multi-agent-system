@@ -11,9 +11,7 @@ agents = {
     agent.name: agent for agent in [status_agent, eligibility_agent, finance_agent]
 }
 
-
 st.set_page_config(page_title="Visa Application Assistant", layout="wide")
-
 
 st.title("Visa Application Assistant")
 
@@ -37,7 +35,9 @@ for msg in st.session_state.messages:
             )  # Skip TOOL messages for now
 
 # Chat input
-user_input = st.chat_input("Ask visa related questions...")
+user_input = st.chat_input(
+    "Ask visa related questions (e.g. 'What is the status of my application?')"
+)
 
 if user_input:
     st.session_state.messages.append(ChatMessage.from_user(user_input))
@@ -45,7 +45,7 @@ if user_input:
 
     # Run agent
     run_result = agent.run(st.session_state.messages)
-    if run_result["current_agent_message"] is not None:
+    if run_result["current_agent_message"] is not None:  # It may be a tool call
         st.chat_message("Assistant").markdown(run_result["current_agent_message"])
 
     # Update messages and agent
@@ -53,8 +53,18 @@ if user_input:
         run_result["new_agent_name"],
         run_result["new_messages"],
     )
-    st.session_state.messages.extend(new_messages)
 
-    if new_agent_name != st.session_state.current_agent_name:
-        st.session_state.current_agent_name = new_agent_name
-        st.markdown(f"🆕 **Switched to: {new_agent_name}**")
+    if new_messages and new_messages[-1].role == ChatRole.TOOL:
+        run_result = agent.run(st.session_state.messages + new_messages)
+        st.session_state.messages.extend(run_result["new_messages"])
+        st.session_state.messages.extend(new_messages)
+        st.chat_message("Assistant").markdown(run_result["current_agent_message"])
+        if st.session_state.current_agent_name != new_agent_name:
+            st.session_state.current_agent_name = new_agent_name
+            agent = agents[st.session_state.current_agent_name]
+
+            run_result = agent.run(st.session_state.messages)
+            st.session_state.messages.extend(run_result["new_messages"])
+            st.chat_message("Assistant").markdown(run_result["current_agent_message"])
+    else:
+        st.session_state.messages.extend(new_messages)
